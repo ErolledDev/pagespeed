@@ -34,6 +34,17 @@ export interface PageSpeedResult {
       description: string;
       score: number;
       displayValue?: string;
+      details?: {
+        type: string;
+        items?: Array<{
+          url: string;
+        }>;
+      };
     }>;
+    fullPageScreenshot?: {
+      screenshot: {
+        data: string;
+      };
+    };
   };
 }
