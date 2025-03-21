@@ -232,8 +232,8 @@ function PageSpeed() {
           
           {/* URL Input Form */}
           <div className="max-w-3xl mx-auto">
-            <form onSubmit={analyzeWebsite} className="space-y-4">
-              <div className="relative">
+            <form onSubmit={analyzeWebsite} className="flex gap-4">
+              <div className="flex-1 relative">
                 <input
                   type="url"
                   value={url}
@@ -250,10 +250,13 @@ function PageSpeed() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-14 bg-blue-600 text-white text-lg font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2"
+                className="h-14 px-8 bg-blue-600 text-white text-lg font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
               >
                 {loading ? (
-                  <Loader2 className="w-6 h-6 animate-spin" />
+                  <>
+                    <Loader2 className="w-6 h-6 animate-spin" />
+                    Analyzing...
+                  </>
                 ) : (
                   <>
                     <Search className="w-6 h-6" />
@@ -265,6 +268,17 @@ function PageSpeed() {
           </div>
         </div>
       </div>
+
+      {/* Loading State */}
+      {loading && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="bg-white rounded-lg p-8 text-center">
+            <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Analyzing Your Website</h2>
+            <p className="text-gray-600">Please wait while we gather performance metrics and insights...</p>
+          </div>
+        </div>
+      )}
 
       {/* Error Message */}
       {error && (
