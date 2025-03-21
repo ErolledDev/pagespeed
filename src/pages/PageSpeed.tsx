@@ -1,17 +1,47 @@
 import React, { useState } from 'react';
-import { Search, Globe, Loader2, Info, Lightbulb } from 'lucide-react';
+import { Search, Globe, Loader2, Info, Lightbulb, Download, Bot, CheckCircle2, AlertCircle } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import type { PageSpeedResult } from '../types';
+import type { PageSpeedResult, AIAnalysis } from '../types';
 import { ScoreGauge } from '../components/ScoreGauge';
 import { SuggestionCard } from '../components/SuggestionCard';
+import { FAQSection } from '../components/FAQSection';
+import { AIAnalysisSection } from '../components/AIAnalysisSection';
+import { getFromCache, saveToCache } from '../utils/cache';
+import { exportToExcel, exportToCSV } from '../utils/export';
+import { analyzeWithAI } from '../utils/ai';
 
 // Use environment variable for API key
-const API_KEY = import.meta.env.VITE_PAGESPEED_API_KEY || 'AIzaSyDq15ZhJBVLrxXPUDxNJ7Wy-a_SQzQqPHw';
+const API_KEY = import.meta.env.VITE_PAGESPEED_API_KEY;
+
+const features = [
+  {
+    title: "Real-time Analysis",
+    description: "Get instant insights about your website's performance, accessibility, best practices, and SEO.",
+    icon: Globe
+  },
+  {
+    title: "AI-Powered Insights",
+    description: "Receive intelligent recommendations and analysis powered by Google's Gemini AI.",
+    icon: Bot
+  },
+  {
+    title: "Detailed Metrics",
+    description: "Access comprehensive performance metrics and actionable recommendations.",
+    icon: CheckCircle2
+  },
+  {
+    title: "Export Capabilities",
+    description: "Download your analysis results in Excel or CSV format for further analysis.",
+    icon: Download
+  }
+];
 
 function PageSpeed() {
   const [url, setUrl] = useState('');
+  const [aiKey, setAiKey] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PageSpeedResult | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
   const [error, setError] = useState('');
 
   const analyzeWebsite = async (e: React.FormEvent) => {
@@ -29,8 +59,21 @@ function PageSpeed() {
     setLoading(true);
     setError('');
     setResult(null);
+    setAiAnalysis(null);
 
     try {
+      // Check cache first
+      const cachedResult = getFromCache(url);
+      if (cachedResult) {
+        setResult(cachedResult);
+        if (aiKey) {
+          const aiResult = await analyzeWithAI(cachedResult, aiKey);
+          setAiAnalysis(aiResult);
+        }
+        setLoading(false);
+        return;
+      }
+
       const apiUrl = new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed');
       apiUrl.searchParams.append('url', url);
       apiUrl.searchParams.append('key', API_KEY);
@@ -54,6 +97,12 @@ function PageSpeed() {
       }
 
       setResult(data);
+      saveToCache(url, data);
+
+      if (aiKey) {
+        const aiResult = await analyzeWithAI(data, aiKey);
+        setAiAnalysis(aiResult);
+      }
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -124,63 +173,178 @@ function PageSpeed() {
     return suggestions;
   };
 
+  const getPositiveFeedback = (result: PageSpeedResult) => {
+    const feedback = [];
+    const { categories } = result.lighthouseResult;
+
+    if (categories.performance?.score >= 0.9) {
+      feedback.push({
+        category: 'Performance',
+        score: categories.performance.score,
+        message: 'Excellent performance! Your website loads quickly and efficiently.'
+      });
+    }
+
+    if (categories.accessibility?.score >= 0.9) {
+      feedback.push({
+        category: 'Accessibility',
+        score: categories.accessibility.score,
+        message: 'Great job on accessibility! Your website is well-optimized for all users.'
+      });
+    }
+
+    if (categories['best-practices']?.score >= 0.9) {
+      feedback.push({
+        category: 'Best Practices',
+        score: categories['best-practices'].score,
+        message: 'Excellent adherence to web best practices!'
+      });
+    }
+
+    if (categories.seo?.score >= 0.9) {
+      feedback.push({
+        category: 'SEO',
+        score: categories.seo.score,
+        message: 'Outstanding SEO optimization! Your website is well-positioned for search engines.'
+      });
+    }
+
+    return feedback;
+  };
+
+  const exportData = (format: 'excel' | 'csv') => {
+    if (!result) return;
+
+    const data = Object.entries(result.lighthouseResult.audits)
+      .filter(([_, audit]) => audit && audit.score !== null)
+      .map(([key, audit]) => ({
+        Metric: audit.title,
+        Score: Math.round(audit.score * 100),
+        Description: audit.description
+      }));
+
+    const filename = `pagespeed-analysis-${new Date().toISOString().split('T')[0]}`;
+    
+    if (format === 'excel') {
+      exportToExcel(data, filename);
+    } else {
+      exportToCSV(data, filename);
+    }
+  };
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-      {/* Hero Section - Simplified */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Website Performance Analysis
-        </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Get insights about your website's performance, accessibility, best practices, and SEO.
-        </p>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      {/* Hero Section */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+          <h1 className="text-4xl font-bold text-gray-900 mb-6">
+            Analyze Your Website Performance
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12">
+            Get comprehensive insights about your website's performance, accessibility, best practices, and SEO with our advanced analysis tool.
+          </p>
+          
+          {/* URL Input Form */}
+          <div className="max-w-3xl mx-auto">
+            <form onSubmit={analyzeWebsite} className="space-y-4">
+              <div className="relative">
+                <input
+                  type="url"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="Enter website URL (e.g., https://example.com)"
+                  className="w-full h-14 pl-12 pr-4 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                  required
+                  pattern="https?://.*"
+                  title="Please enter a valid URL starting with http:// or https://"
+                />
+                <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+              </div>
+              
+              <div className="relative">
+                <input
+                  type="password"
+                  value={aiKey}
+                  onChange={(e) => setAiKey(e.target.value)}
+                  placeholder="Google Gemini API Key (Optional)"
+                  className="w-full h-14 pl-12 pr-4 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+                />
+                <Bot className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full h-14 bg-blue-600 text-white text-lg font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {loading ? (
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                ) : (
+                  <>
+                    <Search className="w-6 h-6" />
+                    Analyze Website
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
 
-      {/* URL Input Form - Streamlined */}
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-        <form onSubmit={analyzeWebsite} className="flex gap-3">
-          <div className="flex-1 relative">
-            <input
-              type="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="Enter website URL (e.g., https://example.com)"
-              className="w-full h-12 pl-10 pr-4 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-              pattern="https?://.*"
-              title="Please enter a valid URL starting with http:// or https://"
-            />
-            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="h-12 px-6 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 flex items-center gap-2"
-          >
-            {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Search className="w-5 h-5" />
-            )}
-            Analyze
-          </button>
-        </form>
+      {/* Features Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <h2 className="text-3xl font-bold text-gray-900 text-center mb-16">
+          Powerful Features
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {features.map((feature, index) => (
+            <div key={index} className="bg-white rounded-xl shadow-sm p-6">
+              <feature.icon className="w-12 h-12 text-blue-600 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {feature.title}
+              </h3>
+              <p className="text-gray-600">
+                {feature.description}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-100 rounded-lg p-4 mb-8">
-          <p className="text-red-800 text-center text-sm">{error}</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+          <div className="bg-red-50 border border-red-100 rounded-lg p-4">
+            <p className="text-red-800 text-center text-sm">{error}</p>
+          </div>
         </div>
       )}
 
       {/* Results */}
       {result?.lighthouseResult && (
-        <div className="space-y-8">
-          {/* Performance Overview - 2 columns */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+          {/* Export Buttons */}
+          <div className="flex justify-end gap-4">
+            <button
+              onClick={() => exportData('excel')}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export to Excel
+            </button>
+            <button
+              onClick={() => exportData('csv')}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export to CSV
+            </button>
+          </div>
+
+          {/* Performance Overview */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Scores */}
-            <div className="bg-white rounded-lg shadow-sm">
+            <div className="bg-white rounded-xl shadow-sm">
               <div className="px-6 py-4 border-b border-gray-100">
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold text-gray-900">Performance Scores</h2>
@@ -230,15 +394,27 @@ function PageSpeed() {
             </div>
 
             {/* Suggestions */}
-            <div className="bg-white rounded-lg shadow-sm">
+            <div className="bg-white rounded-xl shadow-sm">
               <div className="px-6 py-4 border-b border-gray-100">
                 <div className="flex items-center gap-2">
                   <Lightbulb className="w-5 h-5 text-blue-600" />
-                  <h2 className="text-xl font-semibold text-gray-900">Quick Improvements</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">Analysis Summary</h2>
                 </div>
               </div>
               <div className="p-6">
                 <div className="space-y-4">
+                  {/* Positive Feedback */}
+                  {getPositiveFeedback(result).map((feedback, index) => (
+                    <div key={index} className="bg-emerald-50 border border-emerald-100 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                        <h3 className="font-semibold text-emerald-900">{feedback.category}</h3>
+                      </div>
+                      <p className="text-emerald-800">{feedback.message}</p>
+                    </div>
+                  ))}
+                  
+                  {/* Improvement Suggestions */}
                   {getImprovementSuggestions(result).map((suggestion, index) => (
                     <SuggestionCard
                       key={index}
@@ -252,8 +428,13 @@ function PageSpeed() {
             </div>
           </div>
 
-          {/* Detailed Metrics Table - Simplified */}
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          {/* AI Analysis */}
+          {aiAnalysis && (
+            <AIAnalysisSection analysis={aiAnalysis} />
+          )}
+
+          {/* Detailed Metrics Table */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100">
               <h2 className="text-xl font-semibold text-gray-900">Detailed Metrics</h2>
             </div>
@@ -301,6 +482,9 @@ function PageSpeed() {
           </div>
         </div>
       )}
+
+      {/* FAQ Section */}
+      <FAQSection />
     </div>
   );
 }

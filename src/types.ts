@@ -48,3 +48,18 @@ export interface PageSpeedResult {
     };
   };
 }
+
+export interface AnalysisCache {
+  [url: string]: {
+    timestamp: number;
+    result: PageSpeedResult;
+  };
+}
+
+export interface AIAnalysis {
+  performance: string;
+  accessibility: string;
+  bestPractices: string;
+  seo: string;
+  overall: string;
+}
