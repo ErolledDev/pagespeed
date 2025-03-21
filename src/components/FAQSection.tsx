@@ -3,13 +3,8 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const faqs = [
   {
-    question: "What is PageSpeed Insights?",
-    answer: "PageSpeed Insights is a tool that analyzes your website's performance on both mobile and desktop devices. It provides detailed metrics and suggestions for improving your website's speed and user experience."
-  },
-
-  {
-    question: "How do I get a Google Gemini AI API key?",
-    answer: "1. Visit Google AI Studio (https://makersuite.google.com/app/apikey)\n2. Sign in with your Google account\n3. Click 'Create API Key'\n4. Copy your new API key\n\nNote: The AI analysis feature is optional and requires a valid Gemini API key."
+    question: "What is WebsiteSpeed Checker?",
+    answer: "WebsiteSpeed Checker is a comprehensive tool that analyzes your website's performance on both mobile and desktop devices. It provides detailed metrics and suggestions for improving your website's speed, accessibility, and user experience."
   },
   {
     question: "What do the scores mean?",
@@ -18,6 +13,26 @@ const faqs = [
   {
     question: "How often should I analyze my website?",
     answer: "We recommend analyzing your website:\n- After major updates or changes\n- Monthly for regular maintenance\n- When you notice performance issues\n- Before major marketing campaigns"
+  },
+  {
+    question: "What metrics are analyzed?",
+    answer: "We analyze several key metrics including:\n- Loading performance (FCP, LCP, CLS)\n- Accessibility standards (WCAG compliance)\n- SEO optimization (meta tags, structure)\n- Web best practices (security, modern APIs)\n- User experience factors (mobile-friendly)"
+  },
+  {
+    question: "Why is website speed important?",
+    answer: "Website speed is crucial because:\n- It affects user experience and engagement\n- Impacts search engine rankings\n- Influences conversion rates\n- Reduces bounce rates\n- Improves mobile performance"
+  },
+  {
+    question: "How can I improve my website's performance?",
+    answer: "Common ways to improve performance include:\n- Optimizing images and media\n- Minimizing JavaScript and CSS\n- Using content delivery networks (CDN)\n- Implementing browser caching\n- Reducing server response time"
+  },
+  {
+    question: "What's the difference between mobile and desktop scores?",
+    answer: "Mobile and desktop scores can differ due to:\n- Different network conditions\n- Processing power variations\n- Screen size adaptations\n- Touch vs mouse interactions\n- Mobile-specific optimizations"
+  },
+  {
+    question: "How accurate are the results?",
+    answer: "Our results are highly accurate as we use Google's PageSpeed Insights API, which:\n- Provides real-world performance data\n- Uses Lighthouse for analysis\n- Considers multiple factors\n- Updates regularly with web standards"
   }
 ];
 

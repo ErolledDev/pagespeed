@@ -55,11 +55,3 @@ export interface AnalysisCache {
     result: PageSpeedResult;
   };
 }
-
-export interface AIAnalysis {
-  performance: string;
-  accessibility: string;
-  bestPractices: string;
-  seo: string;
-  overall: string;
-}

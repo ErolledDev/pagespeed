@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { Search, Globe, Loader2, Info, Lightbulb, Download, Bot, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Search, Globe, Loader2, Info, Lightbulb, Download } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import type { PageSpeedResult, AIAnalysis } from '../types';
+import type { PageSpeedResult } from '../types';
 import { ScoreGauge } from '../components/ScoreGauge';
 import { SuggestionCard } from '../components/SuggestionCard';
 import { FAQSection } from '../components/FAQSection';
-import { AIAnalysisSection } from '../components/AIAnalysisSection';
 import { getFromCache, saveToCache } from '../utils/cache';
 import { exportToExcel, exportToCSV } from '../utils/export';
-import { analyzeWithAI } from '../utils/ai';
 
 // Use environment variable for API key
 const API_KEY = import.meta.env.VITE_PAGESPEED_API_KEY;
@@ -20,28 +18,26 @@ const features = [
     icon: Globe
   },
   {
-    title: "AI-Powered Insights",
-    description: "Receive intelligent recommendations and analysis powered by Google's Gemini AI.",
-    icon: Bot
-  },
-  {
     title: "Detailed Metrics",
     description: "Access comprehensive performance metrics and actionable recommendations.",
-    icon: CheckCircle2
+    icon: Info
   },
   {
     title: "Export Capabilities",
     description: "Download your analysis results in Excel or CSV format for further analysis.",
     icon: Download
+  },
+  {
+    title: "Performance Insights",
+    description: "Get detailed insights into your website's performance metrics and optimization opportunities.",
+    icon: Lightbulb
   }
 ];
 
 function PageSpeed() {
   const [url, setUrl] = useState('');
-  const [aiKey, setAiKey] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<PageSpeedResult | null>(null);
-  const [aiAnalysis, setAiAnalysis] = useState<AIAnalysis | null>(null);
   const [error, setError] = useState('');
 
   const analyzeWebsite = async (e: React.FormEvent) => {
@@ -59,17 +55,12 @@ function PageSpeed() {
     setLoading(true);
     setError('');
     setResult(null);
-    setAiAnalysis(null);
 
     try {
       // Check cache first
       const cachedResult = getFromCache(url);
       if (cachedResult) {
         setResult(cachedResult);
-        if (aiKey) {
-          const aiResult = await analyzeWithAI(cachedResult, aiKey);
-          setAiAnalysis(aiResult);
-        }
         setLoading(false);
         return;
       }
@@ -98,11 +89,6 @@ function PageSpeed() {
 
       setResult(data);
       saveToCache(url, data);
-
-      if (aiKey) {
-        const aiResult = await analyzeWithAI(data, aiKey);
-        setAiAnalysis(aiResult);
-      }
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -223,7 +209,7 @@ function PageSpeed() {
         Description: audit.description
       }));
 
-    const filename = `pagespeed-analysis-${new Date().toISOString().split('T')[0]}`;
+    const filename = `websitespeed-analysis-${new Date().toISOString().split('T')[0]}`;
     
     if (format === 'excel') {
       exportToExcel(data, filename);
@@ -241,7 +227,7 @@ function PageSpeed() {
             Analyze Your Website Performance
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12">
-            Get comprehensive insights about your website's performance, accessibility, best practices, and SEO with our advanced analysis tool.
+            Get comprehensive insights about your website's performance, accessibility, best practices, and SEO with WebsiteSpeed Checker.
           </p>
           
           {/* URL Input Form */}
@@ -260,17 +246,6 @@ function PageSpeed() {
                 />
                 <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
               </div>
-              
-              <div className="relative">
-                <input
-                  type="password"
-                  value={aiKey}
-                  onChange={(e) => setAiKey(e.target.value)}
-                  placeholder="Google Gemini API Key (Optional)"
-                  className="w-full h-14 pl-12 pr-4 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
-                />
-                <Bot className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
-              </div>
 
               <button
                 type="submit"
@@ -288,26 +263,6 @@ function PageSpeed() {
               </button>
             </form>
           </div>
-        </div>
-      </div>
-
-      {/* Features Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <h2 className="text-3xl font-bold text-gray-900 text-center mb-16">
-          Powerful Features
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((feature, index) => (
-            <div key={index} className="bg-white rounded-xl shadow-sm p-6">
-              <feature.icon className="w-12 h-12 text-blue-600 mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {feature.title}
-              </h3>
-              <p className="text-gray-600">
-                {feature.description}
-              </p>
-            </div>
-          ))}
         </div>
       </div>
 
@@ -342,7 +297,7 @@ function PageSpeed() {
           </div>
 
           {/* Performance Overview */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="space-y-8">
             {/* Scores */}
             <div className="bg-white rounded-xl shadow-sm">
               <div className="px-6 py-4 border-b border-gray-100">
@@ -360,7 +315,7 @@ function PageSpeed() {
                 </div>
               </div>
               <div className="p-6">
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   <div>
                     <ScoreGauge 
                       score={result.lighthouseResult.categories.performance.score}
@@ -393,7 +348,7 @@ function PageSpeed() {
               </div>
             </div>
 
-            {/* Suggestions */}
+            {/* Analysis Summary */}
             <div className="bg-white rounded-xl shadow-sm">
               <div className="px-6 py-4 border-b border-gray-100">
                 <div className="flex items-center gap-2">
@@ -403,18 +358,13 @@ function PageSpeed() {
               </div>
               <div className="p-6">
                 <div className="space-y-4">
-                  {/* Positive Feedback */}
                   {getPositiveFeedback(result).map((feedback, index) => (
                     <div key={index} className="bg-emerald-50 border border-emerald-100 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                        <h3 className="font-semibold text-emerald-900">{feedback.category}</h3>
-                      </div>
+                      <h3 className="font-semibold text-emerald-900 mb-2">{feedback.category}</h3>
                       <p className="text-emerald-800">{feedback.message}</p>
                     </div>
                   ))}
                   
-                  {/* Improvement Suggestions */}
                   {getImprovementSuggestions(result).map((suggestion, index) => (
                     <SuggestionCard
                       key={index}
@@ -426,62 +376,77 @@ function PageSpeed() {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* AI Analysis */}
-          {aiAnalysis && (
-            <AIAnalysisSection analysis={aiAnalysis} />
-          )}
-
-          {/* Detailed Metrics Table */}
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100">
-              <h2 className="text-xl font-semibold text-gray-900">Detailed Metrics</h2>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Metric</th>
-                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900 w-24">Score</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Description</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {Object.entries(result.lighthouseResult.audits)
-                    .filter(([_, audit]) => audit && audit.score !== null)
-                    .map(([key, audit]) => {
-                      const score = Math.round(audit.score * 100);
-                      const scoreColor = score >= 90 
-                        ? 'text-emerald-600' 
-                        : score >= 50 
-                        ? 'text-amber-600' 
-                        : 'text-rose-600';
-                      
-                      return (
-                        <tr key={key} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                            {audit.title}
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            <span className={`text-sm font-semibold ${scoreColor}`}>
-                              {score}%
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="max-w-xl prose prose-sm">
-                              <ReactMarkdown>{audit.description}</ReactMarkdown>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
+            {/* Detailed Metrics Table */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <h2 className="text-xl font-semibold text-gray-900">Detailed Metrics</h2>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Metric</th>
+                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900 w-24">Score</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {Object.entries(result.lighthouseResult.audits)
+                      .filter(([_, audit]) => audit && audit.score !== null)
+                      .map(([key, audit]) => {
+                        const score = Math.round(audit.score * 100);
+                        const scoreColor = score >= 90 
+                          ? 'text-emerald-600' 
+                          : score >= 50 
+                          ? 'text-amber-600' 
+                          : 'text-rose-600';
+                        
+                        return (
+                          <tr key={key} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                              {audit.title}
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              <span className={`text-sm font-semibold ${scoreColor}`}>
+                                {score}%
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="max-w-xl prose prose-sm">
+                                <ReactMarkdown>{audit.description}</ReactMarkdown>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* Features Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <h2 className="text-3xl font-bold text-gray-900 text-center mb-16">
+          Powerful Features
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {features.map((feature, index) => (
+            <div key={index} className="bg-white rounded-xl shadow-sm p-6">
+              <feature.icon className="w-12 h-12 text-blue-600 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {feature.title}
+              </h3>
+              <p className="text-gray-600">
+                {feature.description}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* FAQ Section */}
       <FAQSection />
