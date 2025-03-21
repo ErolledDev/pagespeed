@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Search, Globe, Loader2, ExternalLink, Info, Lightbulb, ChevronRight } from 'lucide-react';
+import { Search, Globe, Loader2, Info, Lightbulb } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import type { PageSpeedResult } from '../types';
 import { ScoreGauge } from '../components/ScoreGauge';
 import { SuggestionCard } from '../components/SuggestionCard';
 
-const API_KEY = 'AIzaSyCxxLVr0o8c0lK-1CvnzPhrkv2q_YB5b6A';
+// Use environment variable for API key
+const API_KEY = import.meta.env.VITE_PAGESPEED_API_KEY || 'AIzaSyDq15ZhJBVLrxXPUDxNJ7Wy-a_SQzQqPHw';
 
 function PageSpeed() {
   const [url, setUrl] = useState('');
@@ -16,23 +18,48 @@ function PageSpeed() {
     e.preventDefault();
     if (!url) return;
 
+    // Validate URL format
+    try {
+      new URL(url);
+    } catch {
+      setError('Please enter a valid URL (e.g., https://example.com)');
+      return;
+    }
+
     setLoading(true);
     setError('');
     setResult(null);
 
     try {
-      const response = await fetch(
-        `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&key=${API_KEY}&strategy=mobile&category=PERFORMANCE&category=ACCESSIBILITY&category=BEST_PRACTICES&category=SEO&screenshot=true`
-      );
+      const apiUrl = new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed');
+      apiUrl.searchParams.append('url', url);
+      apiUrl.searchParams.append('key', API_KEY);
+      apiUrl.searchParams.append('strategy', 'mobile');
+      apiUrl.searchParams.append('category', 'PERFORMANCE');
+      apiUrl.searchParams.append('category', 'ACCESSIBILITY');
+      apiUrl.searchParams.append('category', 'BEST_PRACTICES');
+      apiUrl.searchParams.append('category', 'SEO');
+
+      const response = await fetch(apiUrl.toString());
       
       if (!response.ok) {
-        throw new Error('Failed to analyze website');
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || 'Failed to analyze website');
       }
 
       const data = await response.json();
+      
+      if (!data.lighthouseResult) {
+        throw new Error('Invalid response from PageSpeed API');
+      }
+
       setResult(data);
     } catch (err) {
-      setError('Failed to analyze website. Please check the URL and try again.');
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Failed to analyze website. Please check the URL and try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -42,7 +69,6 @@ function PageSpeed() {
     const suggestions = [];
     const { categories, audits } = result.lighthouseResult;
 
-    // Performance suggestions
     if (categories.performance?.score < 0.9) {
       suggestions.push({
         category: 'Performance',
@@ -56,7 +82,6 @@ function PageSpeed() {
       });
     }
 
-    // Accessibility suggestions
     if (categories.accessibility?.score < 0.9) {
       suggestions.push({
         category: 'Accessibility',
@@ -70,7 +95,6 @@ function PageSpeed() {
       });
     }
 
-    // Best Practices suggestions
     if (categories['best-practices']?.score < 0.9) {
       suggestions.push({
         category: 'Best Practices',
@@ -84,7 +108,6 @@ function PageSpeed() {
       });
     }
 
-    // SEO suggestions
     if (categories.seo?.score < 0.9) {
       suggestions.push({
         category: 'SEO',
@@ -102,47 +125,42 @@ function PageSpeed() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Hero Section */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+      {/* Hero Section - Simplified */}
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
           Website Performance Analysis
         </h1>
-        <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-          Get comprehensive insights about your website's performance, accessibility, best practices, and SEO. 
-          Our tool provides detailed metrics and actionable recommendations.
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          Get insights about your website's performance, accessibility, best practices, and SEO.
         </p>
       </div>
 
-      {/* URL Input Form */}
-      <div className="bg-white rounded-2xl shadow-xl p-8 mb-12 backdrop-blur-lg bg-opacity-90 border border-gray-100">
-        <form onSubmit={analyzeWebsite} className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-2">
-              Enter Website URL
-            </label>
-            <div className="relative">
-              <input
-                type="url"
-                id="url"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://example.com"
-                className="block w-full rounded-xl border-gray-200 shadow-sm focus:ring-blue-500 focus:border-blue-500 pl-12 h-14 text-lg"
-                required
-              />
-              <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
-            </div>
+      {/* URL Input Form - Streamlined */}
+      <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <form onSubmit={analyzeWebsite} className="flex gap-3">
+          <div className="flex-1 relative">
+            <input
+              type="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="Enter website URL (e.g., https://example.com)"
+              className="w-full h-12 pl-10 pr-4 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              required
+              pattern="https?://.*"
+              title="Please enter a valid URL starting with http:// or https://"
+            />
+            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="self-end px-8 h-14 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-xl hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 flex items-center gap-2 transition-all shadow-lg hover:shadow-xl disabled:hover:shadow-lg"
+            className="h-12 px-6 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 flex items-center gap-2"
           >
             {loading ? (
-              <Loader2 className="w-6 h-6 animate-spin" />
+              <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
-              <Search className="w-6 h-6" />
+              <Search className="w-5 h-5" />
             )}
             Analyze
           </button>
@@ -151,70 +169,60 @@ function PageSpeed() {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-12">
-          <p className="text-red-800 text-center">{error}</p>
+        <div className="bg-red-50 border border-red-100 rounded-lg p-4 mb-8">
+          <p className="text-red-800 text-center text-sm">{error}</p>
         </div>
       )}
 
       {/* Results */}
       {result?.lighthouseResult && (
-        <div className="space-y-12">
-          {/* Screenshot */}
-          {result.lighthouseResult.fullPageScreenshot && (
-            <div className="bg-white rounded-2xl shadow-xl p-8 backdrop-blur-lg bg-opacity-90 border border-gray-100">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-6">Page Screenshot</h2>
-              <div className="rounded-xl overflow-hidden border border-gray-200 shadow-lg">
-                <img
-                  src={`data:image/jpeg;base64,${result.lighthouseResult.fullPageScreenshot.screenshot.data}`}
-                  alt="Website screenshot"
-                  className="w-full h-auto"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Performance Overview */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-8">
+          {/* Performance Overview - 2 columns */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Scores */}
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden backdrop-blur-lg bg-opacity-90 border border-gray-100">
-              <div className="px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+            <div className="bg-white rounded-lg shadow-sm">
+              <div className="px-6 py-4 border-b border-gray-100">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-semibold text-gray-900">Performance Scores</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">Performance Scores</h2>
                   <a
                     href="https://web.dev/performance-scoring/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors"
+                    className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
                   >
                     <Info className="w-4 h-4" />
-                    Learn about scoring
+                    About scoring
                   </a>
                 </div>
               </div>
-              <div className="p-8">
-                <div className="grid grid-cols-2 gap-8">
+              <div className="p-6">
+                <div className="grid grid-cols-2 gap-6">
                   <div>
                     <ScoreGauge 
                       score={result.lighthouseResult.categories.performance.score}
                       label="Performance"
+                      size="sm"
                     />
                   </div>
                   <div>
                     <ScoreGauge 
                       score={result.lighthouseResult.categories.accessibility.score}
                       label="Accessibility"
+                      size="sm"
                     />
                   </div>
                   <div>
                     <ScoreGauge 
                       score={result.lighthouseResult.categories['best-practices'].score}
                       label="Best Practices"
+                      size="sm"
                     />
                   </div>
                   <div>
                     <ScoreGauge 
                       score={result.lighthouseResult.categories.seo.score}
                       label="SEO"
+                      size="sm"
                     />
                   </div>
                 </div>
@@ -222,15 +230,15 @@ function PageSpeed() {
             </div>
 
             {/* Suggestions */}
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden backdrop-blur-lg bg-opacity-90 border border-gray-100">
-              <div className="px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+            <div className="bg-white rounded-lg shadow-sm">
+              <div className="px-6 py-4 border-b border-gray-100">
                 <div className="flex items-center gap-2">
-                  <Lightbulb className="w-6 h-6 text-blue-600" />
-                  <h2 className="text-2xl font-semibold text-gray-900">Quick Improvements</h2>
+                  <Lightbulb className="w-5 h-5 text-blue-600" />
+                  <h2 className="text-xl font-semibold text-gray-900">Quick Improvements</h2>
                 </div>
               </div>
-              <div className="p-8">
-                <div className="space-y-6">
+              <div className="p-6">
+                <div className="space-y-4">
                   {getImprovementSuggestions(result).map((suggestion, index) => (
                     <SuggestionCard
                       key={index}
@@ -244,21 +252,18 @@ function PageSpeed() {
             </div>
           </div>
 
-          {/* Detailed Metrics Table */}
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden backdrop-blur-lg bg-opacity-90 border border-gray-100">
-            <div className="px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
-              <div className="flex items-center gap-2">
-                <Lightbulb className="w-6 h-6 text-blue-600" />
-                <h2 className="text-2xl font-semibold text-gray-900">Detailed Metrics</h2>
-              </div>
+          {/* Detailed Metrics Table - Simplified */}
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h2 className="text-xl font-semibold text-gray-900">Detailed Metrics</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-gradient-to-r from-gray-50 to-white">
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 w-1/4">Metric</th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900 w-24">Score</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Description</th>
+                  <tr className="bg-gray-50">
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Metric</th>
+                    <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900 w-24">Score</th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Description</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -273,27 +278,18 @@ function PageSpeed() {
                         : 'text-rose-600';
                       
                       return (
-                        <tr key={key} className="hover:bg-gray-50 transition-colors">
+                        <tr key={key} className="hover:bg-gray-50">
                           <td className="px-6 py-4 text-sm font-medium text-gray-900">
                             {audit.title}
                           </td>
                           <td className="px-6 py-4 text-center">
-                            <span className={`text-sm font-bold ${scoreColor}`}>
+                            <span className={`text-sm font-semibold ${scoreColor}`}>
                               {score}%
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="max-w-2xl">
-                              <p className="text-sm text-gray-600 mb-2">{audit.description}</p>
-                              <a
-                                href={`https://web.dev/lighthouse-${key}/`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800 text-sm inline-flex items-center gap-1 transition-colors"
-                              >
-                                Learn more
-                                <ChevronRight className="w-4 h-4" />
-                              </a>
+                            <div className="max-w-xl prose prose-sm">
+                              <ReactMarkdown>{audit.description}</ReactMarkdown>
                             </div>
                           </td>
                         </tr>
