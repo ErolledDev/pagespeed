@@ -1,76 +1,83 @@
 import React from 'react';
-import { Mail, Phone, MapPin } from 'lucide-react';
+import { Mail, Phone, MapPin, Globe, Clock, Users, MessageSquare, Building2 } from 'lucide-react';
 
 function Contact() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Hero Section */}
       <div className="text-center mb-12">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Contact Us</h1>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Have questions about PageSpeed Insights? We're here to help. Contact us using any of the methods below.
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">Get in Touch</h1>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          Have questions about WebsiteSpeed Checker? Our team is here to help you optimize your website's performance.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-          <Mail className="w-8 h-8 text-blue-600 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Email</h2>
-          <p className="text-gray-600">support@pagespeed.example.com</p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Main Contact Information */}
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <MessageSquare className="w-6 h-6 text-blue-600" />
+            <h2 className="text-2xl font-semibold text-gray-900">Contact Information</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <Mail className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Email Support</h3>
+                  <p className="text-gray-600 mb-1">General Support:</p>
+                  <p className="text-blue-600 hover:text-blue-800">support@websitespeedchecker.com</p>
+                  <p className="text-gray-600 mb-1 mt-2">Business Inquiries:</p>
+                  <p className="text-blue-600 hover:text-blue-800">business@websitespeedchecker.com</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <Phone className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Phone Support</h3>
+                  <p className="text-gray-600 mb-1">Technical Support:</p>
+                  <p className="text-blue-600 hover:text-blue-800">+1 (555) 123-4567</p>
+                  <p className="text-gray-600 mb-1 mt-2">Sales Team:</p>
+                  <p className="text-blue-600 hover:text-blue-800">+1 (555) 987-6543</p>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <MapPin className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-semibold text-gray-900">Office Location</h3>
+                  <p className="text-gray-600">
+                    123 Performance Street<br />
+                    Web City, IN 12345<br />
+                    United States
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-          <Phone className="w-8 h-8 text-blue-600 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Phone</h2>
-          <p className="text-gray-600">+1 (555) 123-4567</p>
+        {/* Enterprise Solutions */}
+        <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="flex items-center gap-3 mb-6">
+            <Building2 className="w-6 h-6 text-blue-600" />
+            <h2 className="text-2xl font-semibold text-gray-900">Enterprise Solutions</h2>
+          </div>
+          <p className="text-gray-600 mb-6">
+            Looking for enterprise-level website performance optimization? Our dedicated team provides customized solutions for large-scale operations.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="font-semibold text-gray-900 mb-2">Custom Integration</h3>
+              <p className="text-gray-600">Tailored solutions integrated with your existing infrastructure.</p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="font-semibold text-gray-900 mb-2">Dedicated Support</h3>
+              <p className="text-gray-600">24/7 priority support with dedicated account management.</p>
+            </div>
+          </div>
         </div>
-
-        <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-          <MapPin className="w-8 h-8 text-blue-600 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Address</h2>
-          <p className="text-gray-600">123 Performance Street<br />Web City, IN 12345</p>
-        </div>
-      </div>
-
-      <div className="mt-12 bg-white rounded-xl shadow-lg p-8">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">Send us a message</h2>
-        <form className="space-y-6">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-              Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              className="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              className="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div>
-            <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-              Message
-            </label>
-            <textarea
-              id="message"
-              rows={4}
-              className="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            ></textarea>
-          </div>
-          <button
-            type="submit"
-            className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-          >
-            Send Message
-          </button>
-        </form>
       </div>
     </div>
   );

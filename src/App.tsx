@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Globe } from 'lucide-react';
+import { Gauge } from 'lucide-react';
 import PageSpeed from './pages/PageSpeed';
 import Contact from './pages/Contact';
 import Privacy from './pages/Privacy';
@@ -14,9 +14,9 @@ function App() {
         <header className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex items-center gap-3">
-              <Globe className="w-8 h-8 text-blue-600" />
+              <Gauge className="w-8 h-8 text-blue-600" />
               <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">
-                PageSpeed Insights
+                WebsiteSpeed Checker
               </Link>
             </div>
           </div>
@@ -41,7 +41,7 @@ function App() {
                   About
                 </h3>
                 <p className="text-base text-gray-500">
-                  PageSpeed Insights analyzes your website's performance and provides recommendations to make it faster.
+                  WebsiteSpeed Checker analyzes your website's performance and provides recommendations to make it faster.
                 </p>
               </div>
               <div>
@@ -76,7 +76,7 @@ function App() {
             </div>
             <div className="mt-8 pt-8 border-t border-gray-200">
               <p className="text-base text-gray-400 text-center">
-                © {new Date().getFullYear()} PageSpeed Insights. All rights reserved.
+                © {new Date().getFullYear()} WebsiteSpeed Checker. All rights reserved.
               </p>
             </div>
           </div>
@@ -86,4 +86,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
