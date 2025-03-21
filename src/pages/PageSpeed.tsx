@@ -105,17 +105,17 @@ function PageSpeed() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Hero Section */}
       <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
-          Analyze Your Website Performance
-        </h2>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Get insights about your website's performance, accessibility, best practices, and SEO. 
-          Our tool provides detailed metrics and actionable recommendations to improve your site.
+        <h1 className="text-4xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">
+          Website Performance Analysis
+        </h1>
+        <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+          Get comprehensive insights about your website's performance, accessibility, best practices, and SEO. 
+          Our tool provides detailed metrics and actionable recommendations.
         </p>
       </div>
 
       {/* URL Input Form */}
-      <div className="bg-white rounded-xl shadow-lg p-8 mb-8 backdrop-blur-lg bg-opacity-90">
+      <div className="bg-white rounded-2xl shadow-xl p-8 mb-12 backdrop-blur-lg bg-opacity-90 border border-gray-100">
         <form onSubmit={analyzeWebsite} className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-2">
@@ -128,21 +128,21 @@ function PageSpeed() {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://example.com"
-                className="block w-full rounded-lg border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 pl-10 h-12"
+                className="block w-full rounded-xl border-gray-200 shadow-sm focus:ring-blue-500 focus:border-blue-500 pl-12 h-14 text-lg"
                 required
               />
-              <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
             </div>
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="self-end px-8 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 flex items-center gap-2 transition-colors h-12"
+            className="self-end px-8 h-14 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-xl hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 flex items-center gap-2 transition-all shadow-lg hover:shadow-xl disabled:hover:shadow-lg"
           >
             {loading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="w-6 h-6 animate-spin" />
             ) : (
-              <Search className="w-5 h-5" />
+              <Search className="w-6 h-6" />
             )}
             Analyze
           </button>
@@ -151,19 +151,19 @@ function PageSpeed() {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
-          <p className="text-red-800">{error}</p>
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-12">
+          <p className="text-red-800 text-center">{error}</p>
         </div>
       )}
 
       {/* Results */}
       {result?.lighthouseResult && (
-        <div className="space-y-8">
+        <div className="space-y-12">
           {/* Screenshot */}
           {result.lighthouseResult.fullPageScreenshot && (
-            <div className="bg-white rounded-xl shadow-lg p-8 backdrop-blur-lg bg-opacity-90">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Page Screenshot</h2>
-              <div className="rounded-lg overflow-hidden border border-gray-200">
+            <div className="bg-white rounded-2xl shadow-xl p-8 backdrop-blur-lg bg-opacity-90 border border-gray-100">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6">Page Screenshot</h2>
+              <div className="rounded-xl overflow-hidden border border-gray-200 shadow-lg">
                 <img
                   src={`data:image/jpeg;base64,${result.lighthouseResult.fullPageScreenshot.screenshot.data}`}
                   alt="Website screenshot"
@@ -176,10 +176,10 @@ function PageSpeed() {
           {/* Performance Overview */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Scores */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden backdrop-blur-lg bg-opacity-90">
-              <div className="px-8 py-6 border-b border-gray-200">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden backdrop-blur-lg bg-opacity-90 border border-gray-100">
+              <div className="px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-gray-900">Performance Scores</h2>
+                  <h2 className="text-2xl font-semibold text-gray-900">Performance Scores</h2>
                   <a
                     href="https://web.dev/performance-scoring/"
                     target="_blank"
@@ -222,11 +222,11 @@ function PageSpeed() {
             </div>
 
             {/* Suggestions */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden backdrop-blur-lg bg-opacity-90">
-              <div className="px-8 py-6 border-b border-gray-200">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden backdrop-blur-lg bg-opacity-90 border border-gray-100">
+              <div className="px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
                 <div className="flex items-center gap-2">
                   <Lightbulb className="w-6 h-6 text-blue-600" />
-                  <h2 className="text-xl font-semibold text-gray-900">Quick Improvements</h2>
+                  <h2 className="text-2xl font-semibold text-gray-900">Quick Improvements</h2>
                 </div>
               </div>
               <div className="p-8">
@@ -245,23 +245,23 @@ function PageSpeed() {
           </div>
 
           {/* Detailed Metrics Table */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden backdrop-blur-lg bg-opacity-90">
-            <div className="px-8 py-6 border-b border-gray-200">
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden backdrop-blur-lg bg-opacity-90 border border-gray-100">
+            <div className="px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
               <div className="flex items-center gap-2">
                 <Lightbulb className="w-6 h-6 text-blue-600" />
-                <h2 className="text-xl font-semibold text-gray-900">Detailed Metrics</h2>
+                <h2 className="text-2xl font-semibold text-gray-900">Detailed Metrics</h2>
               </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-gray-50">
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metric</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Score</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                  <tr className="bg-gradient-to-r from-gray-50 to-white">
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 w-1/4">Metric</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900 w-24">Score</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Description</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-100">
                   {Object.entries(result.lighthouseResult.audits)
                     .filter(([_, audit]) => audit && audit.score !== null)
                     .map(([key, audit]) => {
@@ -273,26 +273,28 @@ function PageSpeed() {
                         : 'text-rose-600';
                       
                       return (
-                        <tr key={key} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <tr key={key} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4 text-sm font-medium text-gray-900">
                             {audit.title}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-center">
+                          <td className="px-6 py-4 text-center">
                             <span className={`text-sm font-bold ${scoreColor}`}>
                               {score}%
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-500">
-                            <p className="line-clamp-2">{audit.description}</p>
-                            <a
-                              href={`https://web.dev/lighthouse-${key}/`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 text-sm mt-1 inline-flex items-center gap-1"
-                            >
-                              Learn more
-                              <ChevronRight className="w-4 h-4" />
-                            </a>
+                          <td className="px-6 py-4">
+                            <div className="max-w-2xl">
+                              <p className="text-sm text-gray-600 mb-2">{audit.description}</p>
+                              <a
+                                href={`https://web.dev/lighthouse-${key}/`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-800 text-sm inline-flex items-center gap-1 transition-colors"
+                              >
+                                Learn more
+                                <ChevronRight className="w-4 h-4" />
+                              </a>
+                            </div>
                           </td>
                         </tr>
                       );
