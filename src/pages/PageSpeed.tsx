@@ -8,7 +8,6 @@ import { FAQSection } from '../components/FAQSection';
 import { getFromCache, saveToCache } from '../utils/cache';
 import { exportToExcel, exportToCSV } from '../utils/export';
 
-// Use environment variable for API key
 const API_KEY = import.meta.env.VITE_PAGESPEED_API_KEY;
 
 const features = [
@@ -44,7 +43,6 @@ function PageSpeed() {
     e.preventDefault();
     if (!url) return;
 
-    // Validate URL format
     try {
       new URL(url);
     } catch {
@@ -57,7 +55,6 @@ function PageSpeed() {
     setResult(null);
 
     try {
-      // Check cache first
       const cachedResult = getFromCache(url);
       if (cachedResult) {
         setResult(cachedResult);
@@ -220,47 +217,49 @@ function PageSpeed() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      {/* Hero Section */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-gradient-to-br from-blue-600 to-blue-800 border-b border-blue-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-6">
+          <h1 className="font-bold text-white mb-6 leading-tight" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>
             Analyze Your Website Performance
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-12">
+          <p className="text-blue-100 max-w-3xl mx-auto mb-12" style={{ fontSize: 'clamp(1.125rem, 2vw, 1.25rem)' }}>
             Get comprehensive insights about your website's performance, accessibility, best practices, and SEO with WebsiteSpeed Checker.
           </p>
           
-          {/* URL Input Form */}
           <div className="max-w-3xl mx-auto">
             <form onSubmit={analyzeWebsite} className="flex gap-4">
               <div className="flex-1 relative">
-                <input
-                  type="url"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="Enter website URL (e.g., https://example.com)"
-                  className="w-full h-14 pl-12 pr-4 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
-                  required
-                  pattern="https?://.*"
-                  title="Please enter a valid URL starting with http:// or https://"
-                />
-                <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+                <div className="relative">
+                  <input
+                    type="url"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="Enter website URL (e.g., https://example.com)"
+                    className="w-full h-14 pl-12 pr-4 rounded-lg border-2 border-blue-400 focus:ring-2 focus:ring-white focus:border-transparent bg-white/10 text-white placeholder-blue-200 backdrop-blur-sm transition-all duration-200"
+                    style={{ fontSize: 'clamp(1rem, 1.5vw, 1.125rem)' }}
+                    required
+                    pattern="https?://.*"
+                    title="Please enter a valid URL starting with http:// or https://"
+                  />
+                  <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-blue-200" />
+                </div>
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="h-14 px-8 bg-blue-600 text-white text-lg font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
+                className="h-14 px-4 bg-white text-blue-600 font-medium rounded-lg hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap transition-all duration-200"
+                style={{ fontSize: 'clamp(1rem, 1.5vw, 1.125rem)' }}
               >
                 {loading ? (
                   <>
                     <Loader2 className="w-6 h-6 animate-spin" />
-                    Analyzing...
+                    <span className="hidden md:inline">Analyzing...</span>
                   </>
                 ) : (
                   <>
                     <Search className="w-6 h-6" />
-                    Analyze Website
+                    <span className="hidden md:inline">Analyze Website</span>
                   </>
                 )}
               </button>
@@ -269,59 +268,64 @@ function PageSpeed() {
         </div>
       </div>
 
-      {/* Loading State */}
       {loading && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="bg-white rounded-lg p-8 text-center">
             <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Analyzing Your Website</h2>
-            <p className="text-gray-600">Please wait while we gather performance metrics and insights...</p>
+            <h2 className="font-semibold text-gray-900 mb-2" style={{ fontSize: 'clamp(1.25rem, 2vw, 1.5rem)' }}>
+              Analyzing Your Website
+            </h2>
+            <p className="text-gray-600" style={{ fontSize: 'clamp(1rem, 1.5vw, 1.125rem)' }}>
+              Please wait while we gather performance metrics and insights...
+            </p>
           </div>
         </div>
       )}
 
-      {/* Error Message */}
       {error && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="bg-red-50 border border-red-100 rounded-lg p-4">
-            <p className="text-red-800 text-center text-sm">{error}</p>
+            <p className="text-red-800 text-center" style={{ fontSize: 'clamp(0.875rem, 1.5vw, 1rem)' }}>
+              {error}
+            </p>
           </div>
         </div>
       )}
 
-      {/* Results */}
       {result?.lighthouseResult && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
-          {/* Export Buttons */}
           <div className="flex justify-end gap-4">
             <button
               onClick={() => exportData('excel')}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+              style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)' }}
             >
               <Download className="w-4 h-4 mr-2" />
               Export to Excel
             </button>
             <button
               onClick={() => exportData('csv')}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+              style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)' }}
             >
               <Download className="w-4 h-4 mr-2" />
               Export to CSV
             </button>
           </div>
 
-          {/* Performance Overview */}
           <div className="space-y-8">
-            {/* Scores */}
-            <div className="bg-white rounded-xl shadow-sm">
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-100">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-gray-900">Performance Scores</h2>
+                  <h2 className="font-semibold text-gray-900" style={{ fontSize: 'clamp(1.25rem, 2vw, 1.5rem)' }}>
+                    Performance Scores
+                  </h2>
                   <a
                     href="https://web.dev/performance-scoring/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                    className="text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors duration-200"
+                    style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)' }}
                   >
                     <Info className="w-4 h-4" />
                     About scoring
@@ -362,20 +366,25 @@ function PageSpeed() {
               </div>
             </div>
 
-            {/* Analysis Summary */}
-            <div className="bg-white rounded-xl shadow-sm">
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-100">
                 <div className="flex items-center gap-2">
                   <Lightbulb className="w-5 h-5 text-blue-600" />
-                  <h2 className="text-xl font-semibold text-gray-900">Analysis Summary</h2>
+                  <h2 className="font-semibold text-gray-900" style={{ fontSize: 'clamp(1.25rem, 2vw, 1.5rem)' }}>
+                    Analysis Summary
+                  </h2>
                 </div>
               </div>
               <div className="p-6">
                 <div className="space-y-4">
                   {getPositiveFeedback(result).map((feedback, index) => (
                     <div key={index} className="bg-emerald-50 border border-emerald-100 rounded-lg p-4">
-                      <h3 className="font-semibold text-emerald-900 mb-2">{feedback.category}</h3>
-                      <p className="text-emerald-800">{feedback.message}</p>
+                      <h3 className="font-semibold text-emerald-900 mb-2" style={{ fontSize: 'clamp(1rem, 1.5vw, 1.125rem)' }}>
+                        {feedback.category}
+                      </h3>
+                      <p className="text-emerald-800" style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)' }}>
+                        {feedback.message}
+                      </p>
                     </div>
                   ))}
                   
@@ -391,18 +400,25 @@ function PageSpeed() {
               </div>
             </div>
 
-            {/* Detailed Metrics Table */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-100">
-                <h2 className="text-xl font-semibold text-gray-900">Detailed Metrics</h2>
+                <h2 className="font-semibold text-gray-900" style={{ fontSize: 'clamp(1.25rem, 2vw, 1.5rem)' }}>
+                  Detailed Metrics
+                </h2>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="bg-gray-50">
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Metric</th>
-                      <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900 w-24">Score</th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Description</th>
+                      <th className="px-6 py-3 text-left font-semibold text-gray-900" style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)' }}>
+                        Metric
+                      </th>
+                      <th className="px-6 py-3 text-center font-semibold text-gray-900 w-24" style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)' }}>
+                        Score
+                      </th>
+                      <th className="px-6 py-3 text-left font-semibold text-gray-900" style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)' }}>
+                        Description
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -417,17 +433,17 @@ function PageSpeed() {
                           : 'text-rose-600';
                         
                         return (
-                          <tr key={key} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          <tr key={key} className="hover:bg-gray-50 transition-colors duration-150">
+                            <td className="px-6 py-4 font-medium text-gray-900" style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)' }}>
                               {audit.title}
                             </td>
                             <td className="px-6 py-4 text-center">
-                              <span className={`text-sm font-semibold ${scoreColor}`}>
+                              <span className={`font-semibold ${scoreColor}`} style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)' }}>
                                 {score}%
                               </span>
                             </td>
                             <td className="px-6 py-4">
-                              <div className="max-w-xl prose prose-sm">
+                              <div className="max-w-xl prose prose-sm" style={{ fontSize: 'clamp(0.875rem, 1.2vw, 1rem)' }}>
                                 <ReactMarkdown>{audit.description}</ReactMarkdown>
                               </div>
                             </td>
@@ -442,19 +458,18 @@ function PageSpeed() {
         </div>
       )}
 
-      {/* Features Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <h2 className="text-3xl font-bold text-gray-900 text-center mb-16">
+        <h2 className="font-bold text-gray-900 text-center mb-16" style={{ fontSize: 'clamp(1.875rem, 3vw, 2.25rem)' }}>
           Powerful Features
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
-            <div key={index} className="bg-white rounded-xl shadow-sm p-6">
+            <div key={index} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-200 border border-gray-100">
               <feature.icon className="w-12 h-12 text-blue-600 mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="font-semibold text-gray-900 mb-2" style={{ fontSize: 'clamp(1.25rem, 2vw, 1.5rem)' }}>
                 {feature.title}
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600" style={{ fontSize: 'clamp(1rem, 1.5vw, 1.125rem)' }}>
                 {feature.description}
               </p>
             </div>
@@ -462,7 +477,6 @@ function PageSpeed() {
         </div>
       </div>
 
-      {/* FAQ Section */}
       <FAQSection />
     </div>
   );
